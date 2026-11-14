@@ -1,0 +1,328 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anime Episode</title>
+
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #080808;
+  color: white;
+  font-family: Arial, sans-serif;
+  padding: 25px 15px;
+}
+
+.main {
+  max-width: 650px;
+  margin: 70px auto;
+  text-align: center;
+}
+
+.main h2 {
+  color: #d8b15f;
+  margin-bottom: 12px;
+}
+
+.main p {
+  color: #999;
+  margin-bottom: 25px;
+}
+
+.open-btn {
+  background: linear-gradient(120deg,#e5c477,#a77a2b);
+  color: #080808;
+  padding: 15px 35px;
+  border: 0;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* OPTION POPUP */
+
+.option-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.85);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  z-index: 1000;
+}
+
+.option-overlay.active {
+  display: flex;
+}
+
+.option-box {
+  width: 100%;
+  max-width: 390px;
+  background: #151515;
+  border: 1px solid #9c793d;
+  border-radius: 18px;
+  padding: 25px 20px;
+  text-align: center;
+  box-shadow: 0 10px 50px #000;
+}
+
+.option-box h3 {
+  color: #e4c174;
+  font-size: 22px;
+  margin-bottom: 8px;
+}
+
+.option-box p {
+  color: #999;
+  font-size: 13px;
+  margin-bottom: 23px;
+  line-height: 1.5;
+}
+
+.option-btn {
+  width: 100%;
+  padding: 15px;
+  margin-bottom: 12px;
+  border-radius: 10px;
+  font-weight: bold;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.popup-btn {
+  background: linear-gradient(120deg,#e4c477,#a77b2d);
+  border: none;
+  color: #080808;
+}
+
+.direct-btn {
+  background: #222;
+  color: white;
+  border: 1px solid #555;
+}
+
+.cancel-btn {
+  background: transparent;
+  color: #999;
+  border: none;
+  margin-top: 5px;
+  cursor: pointer;
+}
+
+/* VIDEO POPUP */
+
+.video-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.95);
+  z-index: 2000;
+  padding: 12px;
+  align-items: center;
+  justify-content: center;
+}
+
+.video-overlay.active {
+  display: flex;
+}
+
+.video-box {
+  width: 100%;
+  height: 100%;
+  max-width: 1100px;
+  max-height: 850px;
+  background: #111;
+  border: 1px solid #a78340;
+  border-radius: 13px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.video-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px;
+  background: #181818;
+  color: #dfb960;
+}
+
+.close-btn {
+  background: #292929;
+  color: white;
+  border: none;
+  padding: 8px 13px;
+  border-radius: 7px;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.video-frame {
+  flex: 1;
+  min-height: 0;
+}
+
+.video-frame iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: #000;
+}
+
+.video-footer {
+  padding: 10px;
+  color: #888;
+  font-size: 11px;
+  text-align: center;
+  background: #181818;
+}
+
+@media(max-width:600px) {
+  .video-overlay {
+    padding: 0;
+  }
+
+  .video-box {
+    border-radius: 0;
+    max-height: none;
+    border: none;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="main">
+  <h2>ANIME STREAMING</h2>
+  <p>Your episode is ready to watch.</p>
+
+  <button class="open-btn" onclick="showOptions()">
+    ▶ OPEN EPISODE
+  </button>
+</div>
+
+<!-- TWO OPTIONS -->
+
+<div class="option-overlay" id="options">
+  <div class="option-box">
+
+    <h3>Choose Playback</h3>
+
+    <p>Select how you want to watch this episode.</p>
+
+    <button class="option-btn popup-btn"
+      onclick="openPopup()">
+      ▶ POPUP PLAYER
+    </button>
+
+    <button class="option-btn direct-btn"
+      onclick="openDirect()">
+      ↗ OPEN DIRECTLY
+    </button>
+
+    <button class="cancel-btn"
+      onclick="closeOptions()">
+      CANCEL
+    </button>
+
+  </div>
+</div>
+
+<!-- POPUP PLAYER -->
+
+<div class="video-overlay" id="videoPopup">
+
+  <div class="video-box">
+
+    <div class="video-header">
+      <strong>ANIME PLAYER</strong>
+
+      <button class="close-btn"
+        onclick="closePopup()">✕</button>
+    </div>
+
+    <div class="video-frame">
+      <iframe
+        id="playerFrame"
+        allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
+        allowfullscreen
+        referrerpolicy="origin">
+      </iframe>
+    </div>
+
+    <div class="video-footer">
+      Powered by LuluVid
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+const VIDEO_URL = "https://luluvid.com/e/nl0c43smkmjo";
+
+function showOptions() {
+  document.getElementById("options")
+    .classList.add("active");
+}
+
+function closeOptions() {
+  document.getElementById("options")
+    .classList.remove("active");
+}
+
+function openPopup() {
+  closeOptions();
+
+  document.getElementById("videoPopup")
+    .classList.add("active");
+
+  document.getElementById("playerFrame").src =
+    VIDEO_URL;
+
+  document.body.style.overflow = "hidden";
+}
+
+function openDirect() {
+  const newTab = window.open(
+    VIDEO_URL,
+    "_blank"
+  );
+
+  if (!newTab) {
+    window.location.href = VIDEO_URL;
+  }
+
+  closeOptions();
+}
+
+function closePopup() {
+  document.getElementById("videoPopup")
+    .classList.remove("active");
+
+  document.getElementById("playerFrame").src =
+    "about:blank";
+
+  document.body.style.overflow = "";
+}
+
+document.getElementById("options")
+  .addEventListener("click", function(e) {
+    if (e.target === this) closeOptions();
+  });
+</script>
+
+</body>
+  </html>
+  
